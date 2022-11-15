@@ -8,10 +8,10 @@ I have an acryllic background for win terminal, font is jetbrains mono
 
 nvim lsp setup supports 
 
-[ ] - ts
-[ ] - rust
-[ ] - vim 
-[ ] - js
+- ts
+- rust
+- vim 
+- js
 
 idk i forgot anything
 ![image](https://user-images.githubusercontent.com/76754747/201832828-08bce043-69fe-4b27-a317-00869774e653.png)
