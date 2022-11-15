@@ -1,0 +1,2 @@
+# vimrc
+NVIM init.vim
