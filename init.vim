@@ -5,7 +5,8 @@ call plug#begin()
  Plug 'hrsh7th/cmp-vsnip'
  Plug 'hrsh7th/cmp-path'
  Plug 'hrsh7th/cmp-buffer'
- Plug 'scrooloose/nerdtree'
+ Plug 'nvim-tree/nvim-web-devicons'
+ Plug 'nvim-tree/nvim-tree.lua'
  Plug 'preservim/nerdcommenter'
  Plug 'mhinz/vim-startify'
  Plug 'nvim-lua/lsp_extensions.nvim'
@@ -18,17 +19,15 @@ call plug#begin()
  Plug 'nvim-telescope/telescope.nvim'
  Plug 'nvim-lua/plenary.nvim'
 
- Plug 'ryanoasis/vim-devicons'
  Plug 'vim-airline/vim-airline'
  Plug 'vim-airline/vim-airline-themes'
  Plug 'tpope/vim-fugitive'
  Plug 'neovim/nvim-lspconfig'
- Plug 'simrat39/rust-tools.nvim'
 " Debugging
  Plug 'mfussenegger/nvim-dap'
  Plug 'glepnir/lspsaga.nvim'
  Plug 'nvim-treesitter/nvim-treesitter', {'do': ':TSUpdate'}
- Plug 'maxmellon/vim-jsx-pretty'
+ "Plug 'maxmellon/vim-jsx-pretty'
 
 " Color schemes
 Plug 'alligator/accent.vim'
@@ -44,6 +43,8 @@ hi Normal ctermbg=NONE guibg=NONE
 " Configure lsp
 " https://github.com/neovim/nvim-lspconfig#rust_analyzer
 lua <<EOF
+require("nvim-tree").setup()
+require 'nvim-treesitter.install'.prefer_git = false
 require 'nvim-treesitter.install'.compilers = { "gcc" }
 -- nvim_lsp object
 local nvim_lsp = require'lspconfig'
@@ -88,12 +89,11 @@ require'nvim-treesitter.configs'.setup {
     additional_vim_regex_highlighting = false,
   },
 }
-
-require('rust-tools').setup(opts)
-
 nvim_lsp.tsserver.setup({});
 
 EOF
+
+
 
 " Code navigation shortcuts
 " as found in :help lsp
@@ -110,6 +110,7 @@ nnoremap <silent> gd    <cmd>lua vim.lsp.buf.definition()<CR>
 " Quick-fix
 nnoremap <silent> ga    <cmd>lua vim.lsp.buf.code_action()<CR>
 
+nnoremap <silent> `` :NvimTreeToggle<CR>
 " Setup Completion
 " See https://github.com/hrsh7th/nvim-cmp#basic-configuration
 lua <<EOF
@@ -164,11 +165,9 @@ nnoremap <silent> g] <cmd>lua vim.diagnostic.goto_next()<CR>
 autocmd VimEnter *
             \   if !argc()
             \ |   Startify
-            \ |   NERDTree
             \ |   wincmd w
             \ | endif
 
-set shell=pwsh
 set nocompatible
 set colorcolumn=0
 set showmatch               " show matching
