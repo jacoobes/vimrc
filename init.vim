@@ -45,7 +45,7 @@ hi Normal ctermbg=NONE guibg=NONE
 lua <<EOF
 require("nvim-tree").setup()
 require 'nvim-treesitter.install'.prefer_git = false
-require 'nvim-treesitter.install'.compilers = { "gcc" }
+require 'nvim-treesitter.install'.compilers = { "gcc", "clang" }
 -- nvim_lsp object
 local nvim_lsp = require'lspconfig'
 
