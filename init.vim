@@ -18,9 +18,7 @@ call plug#begin()
  Plug 'nvim-lua/popup.nvim'
  Plug 'nvim-telescope/telescope.nvim'
  Plug 'nvim-lua/plenary.nvim'
-
- Plug 'vim-airline/vim-airline'
- Plug 'vim-airline/vim-airline-themes'
+ Plug 'hoob3rt/lualine.nvim'
  Plug 'tpope/vim-fugitive'
  Plug 'neovim/nvim-lspconfig'
 " Debugging
@@ -43,6 +41,7 @@ hi Normal ctermbg=NONE guibg=NONE
 " Configure lsp
 " https://github.com/neovim/nvim-lspconfig#rust_analyzer
 lua <<EOF
+require('lualine').setup()
 require("nvim-tree").setup()
 require 'nvim-treesitter.install'.prefer_git = false
 require 'nvim-treesitter.install'.compilers = { "gcc", "clang" }
@@ -106,7 +105,8 @@ nnoremap <silent> gr    <cmd>lua vim.lsp.buf.references()<CR>
 nnoremap <silent> g0    <cmd>lua vim.lsp.buf.document_symbol()<CR>
 nnoremap <silent> gW    <cmd>lua vim.lsp.buf.workspace_symbol()<CR>
 nnoremap <silent> gd    <cmd>lua vim.lsp.buf.definition()<CR>
-
+nnoremap <leader>ff <cmd>lua require('telescope.builtin').find_files()<cr>
+nnoremap <leader>fb <cmd>lua require('telescope.builtin').buffers()<cr>
 " Quick-fix
 nnoremap <silent> ga    <cmd>lua vim.lsp.buf.code_action()<CR>
 
