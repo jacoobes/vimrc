@@ -20,6 +20,7 @@ call plug#begin()
  Plug 'nvim-lua/plenary.nvim'
  Plug 'hoob3rt/lualine.nvim'
  Plug 'tpope/vim-fugitive'
+ Plug 'lukas-reineke/indent-blankline.nvim'
  Plug 'neovim/nvim-lspconfig'
 " Debugging
  Plug 'mfussenegger/nvim-dap'
@@ -29,6 +30,9 @@ call plug#begin()
 
 " Color schemes
 Plug 'alligator/accent.vim'
+
+" Autosave
+Plug 'Pocco81/auto-save.nvim'
 
 call plug#end()
  if has('termguicolors')
@@ -41,6 +45,10 @@ hi Normal ctermbg=NONE guibg=NONE
 " Configure lsp
 " https://github.com/neovim/nvim-lspconfig#rust_analyzer
 lua <<EOF
+require('auto-save').setup {
+    -- your config goes here
+    -- or just leave it empty :)
+}
 require('lualine').setup()
 require("nvim-tree").setup()
 require 'nvim-treesitter.install'.prefer_git = false
@@ -109,10 +117,13 @@ nnoremap <leader>ff <cmd>lua require('telescope.builtin').find_files()<cr>
 nnoremap <leader>fb <cmd>lua require('telescope.builtin').buffers()<cr>
 " Quick-fix
 nnoremap <silent> ga    <cmd>lua vim.lsp.buf.code_action()<CR>
-
+" toggle tree
 nnoremap <silent> `` :NvimTreeToggle<CR>
-" Setup Completion
+" Setup Completion 
 " See https://github.com/hrsh7th/nvim-cmp#basic-configuration
+nnoremap <leader>n :ASToggle<CR>
+
+
 lua <<EOF
 local cmp = require'cmp'
 cmp.setup({
