@@ -29,8 +29,8 @@ call plug#begin()
  "Plug 'maxmellon/vim-jsx-pretty'
 
 " Color schemes
-Plug 'alligator/accent.vim'
-
+" Plug 'alligator/accent.vim'
+Plug 'catppuccin/nvim', { 'as': 'catppuccin' }
 " Autosave
 Plug 'Pocco81/auto-save.nvim'
 
@@ -38,10 +38,10 @@ call plug#end()
  if has('termguicolors')
     set termguicolors
  endif
-let g:accent_colour="red" 
-let g:accent_darken = 1
-colorscheme accent
-hi Normal ctermbg=NONE guibg=NONE
+"let g:accent_colour="red" 
+"let g:accent_darken = 1
+
+" hi Normal ctermbg=NONE guibg=NONE
 " Configure lsp
 " https://github.com/neovim/nvim-lspconfig#rust_analyzer
 lua <<EOF
@@ -49,7 +49,55 @@ require('auto-save').setup {
     -- your config goes here
     -- or just leave it empty :)
 }
-require('lualine').setup()
+require("catppuccin").setup({
+    flavour = "mocha", -- latte, frappe, macchiato, mocha
+    background = { -- :h background
+        light = "latte",
+        dark = "mocha",
+    },
+    transparent_background = true,
+    show_end_of_buffer = true, -- show the '~' characters after the end of buffers
+    term_colors = true,
+    dim_inactive = {
+        enabled = false,
+        shade = "dark",
+        percentage = 0.15,
+    },
+    no_italic = false, -- Force no italic
+    no_bold = false, -- Force no bold
+    styles = {
+        comments = { "italic" },
+        conditionals = { "italic" },
+        loops = {},
+        functions = {},
+        keywords = {},
+        strings = {},
+        variables = {},
+        numbers = {},
+        booleans = {},
+        properties = {},
+        types = {},
+        operators = {},
+    },
+    color_overrides = {},
+    custom_highlights = {},
+    integrations = {
+        cmp = true,
+    --  gitsigns = true,
+        nvimtree = true,
+        telescope = true,
+        notify = false,
+        mini = false,
+	treesitter = true
+        -- For more plugins integrations please scroll down (https://github.com/catppuccin/nvim#integrations)
+    },
+})
+vim.cmd.colorscheme "catppuccin"
+require('lualine').setup {
+	options = {
+	   theme = "catppuccin"
+	}
+ }
 require("nvim-tree").setup()
 require 'nvim-treesitter.install'.prefer_git = false
 require 'nvim-treesitter.install'.compilers = { "gcc", "clang" }
