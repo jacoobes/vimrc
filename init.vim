@@ -34,7 +34,10 @@ Plug 'catppuccin/nvim', { 'as': 'catppuccin' }
 " Autosave
 Plug 'Pocco81/auto-save.nvim'
 
+Plug 'dpayne/CodeGPT.nvim'
+Plug 'MunifTanjim/nui.nvim'
 call plug#end()
+
  if has('termguicolors')
     set termguicolors
  endif
@@ -98,6 +101,9 @@ require('lualine').setup {
 	   theme = "catppuccin"
 	}
  }
+
+require("codegpt.config")
+require('lualine').setup()
 require("nvim-tree").setup()
 require 'nvim-treesitter.install'.prefer_git = false
 require 'nvim-treesitter.install'.compilers = { "gcc", "clang" }
