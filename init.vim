@@ -1,12 +1,13 @@
-
 call plug#begin()
  Plug 'hrsh7th/nvim-cmp'
  Plug 'hrsh7th/cmp-nvim-lsp'
  Plug 'hrsh7th/cmp-vsnip'
  Plug 'hrsh7th/cmp-path'
  Plug 'hrsh7th/cmp-buffer'
+
+ Plug 'stevearc/oil.nvim'
  Plug 'nvim-tree/nvim-web-devicons'
- Plug 'nvim-tree/nvim-tree.lua'
+
  Plug 'preservim/nerdcommenter'
  Plug 'mhinz/vim-startify'
  Plug 'nvim-lua/lsp_extensions.nvim'
@@ -29,104 +30,66 @@ call plug#begin()
  "Plug 'maxmellon/vim-jsx-pretty'
 
 " Color schemes
-" Plug 'alligator/accent.vim'
-Plug 'catppuccin/nvim', { 'as': 'catppuccin' }
-" Autosave
-Plug 'Pocco81/auto-save.nvim'
+ Plug 'rebelot/kanagawa.nvim'
 
-Plug 'dpayne/CodeGPT.nvim'
-Plug 'MunifTanjim/nui.nvim'
+ " Autosave
+ Plug 'Pocco81/auto-save.nvim'
+ 
+ Plug 'MunifTanjim/nui.nvim'
+ Plug 'Olical/conjure'
+ Plug 'Shougo/deoplete.nvim'
+ Plug 'simrat39/rust-tools.nvim'
+ Plug 'guns/vim-sexp'
+ Plug 'tpope/vim-sexp-mappings-for-regular-people'
+ Plug 'PaterJason/cmp-conjure'
 call plug#end()
 
  if has('termguicolors')
     set termguicolors
  endif
-"let g:accent_colour="red" 
-"let g:accent_darken = 1
+ set background=light
 
-" hi Normal ctermbg=NONE guibg=NONE
-" Configure lsp
-" https://github.com/neovim/nvim-lspconfig#rust_analyzer
+let g:conjure#filetypes = ["clojure", "fennel", "janet", "hy", "julia", "racket", "scheme", "lua", "lisp"]
+let maplocalleader=","
+
 lua <<EOF
+
+local cmp = require'cmp'
+
 require('auto-save').setup {
-    -- your config goes here
-    -- or just leave it empty :)
+    condition = function (buf)
+                    local ft = vim.bo.filetype
+                    return not (ft == "oil")
+                end
 }
-require("catppuccin").setup({
-    flavour = "mocha", -- latte, frappe, macchiato, mocha
-    background = { -- :h background
-        light = "latte",
-        dark = "mocha",
-    },
-    transparent_background = true,
-    show_end_of_buffer = true, -- show the '~' characters after the end of buffers
-    term_colors = true,
-    dim_inactive = {
-        enabled = false,
-        shade = "dark",
-        percentage = 0.15,
-    },
-    no_italic = false, -- Force no italic
-    no_bold = false, -- Force no bold
-    styles = {
-        comments = { "italic" },
-        conditionals = { "italic" },
-        loops = {},
-        functions = {},
-        keywords = {},
-        strings = {},
-        variables = {},
-        numbers = {},
-        booleans = {},
-        properties = {},
-        types = {},
-        operators = {},
-    },
-    color_overrides = {},
-    custom_highlights = {},
-    integrations = {
-        cmp = true,
-    --  gitsigns = true,
-        nvimtree = true,
-        telescope = true,
-        notify = false,
-        mini = false,
-	treesitter = true
-        -- For more plugins integrations please scroll down (https://github.com/catppuccin/nvim#integrations)
-    },
+
+require("oil").setup({
+    view_options = {
+        show_hidden=true     
+    }
 })
-vim.cmd.colorscheme "catppuccin"
+
+vim.cmd.colorscheme "kanagawa-dragon"
+
 require('lualine').setup {
 	options = {
-	   theme = "catppuccin"
+            theme = "kanagawa"
 	}
- }
+}
 
-require("codegpt.config")
-require('lualine').setup()
-require("nvim-tree").setup()
 require 'nvim-treesitter.install'.prefer_git = false
 require 'nvim-treesitter.install'.compilers = { "gcc", "clang" }
 -- nvim_lsp object
 local nvim_lsp = require'lspconfig'
-
+local rt = require("rust-tools")
 local opts = {
-    tools = {
-        autoSetHints = true,
-        hover_with_actions = true,
-        inlay_hints = {
-            show_parameter_hints = true,
-            parameter_hints_prefix = "",
-            other_hints_prefix = "",
-        },
-    },
-
-    -- all the opts to send to nvim-lspconfig
-    -- these override the defaults set by rust-tools.nvim
-    -- see https://github.com/neovim/nvim-lspconfig/blob/master/CONFIG.md#rust_analyzer
     server = {
-        -- on_attach is a callback called when the language server attachs to the buffer
-        -- on_attach = on_attach,
+        on_attach = function(_, bufnr)
+          -- Hover actions
+          vim.keymap.set("n", "<C-space>", rt.hover_actions.hover_actions, { buffer = bufnr })
+          -- Code action groups
+          vim.keymap.set("n", "<Leader>a", rt.code_action_group.code_action_group, { buffer = bufnr })
+        end,
         settings = {
             -- to enable rust-analyzer settings visit:
             -- https://github.com/rust-analyzer/rust-analyzer/blob/master/docs/user/generated_config.adoc
@@ -150,36 +113,20 @@ require'nvim-treesitter.configs'.setup {
     additional_vim_regex_highlighting = false,
   },
 }
-nvim_lsp.tsserver.setup({});
+nvim_lsp.ts_ls.setup{};
+rt.setup(opts);
+nvim_lsp.rust_analyzer.setup{}
+nvim_lsp.clangd.setup{}
+nvim_lsp.pyright.setup{}
 
-EOF
+vim.api.nvim_create_autocmd('TermOpen', {
+    group = vim.api.nvim_create_augroup('custom-term-open', { clear=true }),
+    callback = function()
+        vim.opt.number=false
+        vim.opt.relativenumber = false
+    end
+})
 
-
-
-" Code navigation shortcuts
-" as found in :help lsp
-nnoremap <silent> <c-]> <cmd>lua vim.lsp.buf.definition()<CR>
-nnoremap <silent> K     <cmd>lua vim.lsp.buf.hover()<CR>
-nnoremap <silent> gD    <cmd>lua vim.lsp.buf.implementation()<CR>
-nnoremap <silent> <c-k> <cmd>lua vim.lsp.buf.signature_help()<CR>
-nnoremap <silent> 1gD   <cmd>lua vim.lsp.buf.type_definition()<CR>
-nnoremap <silent> gr    <cmd>lua vim.lsp.buf.references()<CR>
-nnoremap <silent> g0    <cmd>lua vim.lsp.buf.document_symbol()<CR>
-nnoremap <silent> gW    <cmd>lua vim.lsp.buf.workspace_symbol()<CR>
-nnoremap <silent> gd    <cmd>lua vim.lsp.buf.definition()<CR>
-nnoremap <leader>ff <cmd>lua require('telescope.builtin').find_files()<cr>
-nnoremap <leader>fb <cmd>lua require('telescope.builtin').buffers()<cr>
-" Quick-fix
-nnoremap <silent> ga    <cmd>lua vim.lsp.buf.code_action()<CR>
-" toggle tree
-nnoremap <silent> `` :NvimTreeToggle<CR>
-" Setup Completion 
-" See https://github.com/hrsh7th/nvim-cmp#basic-configuration
-nnoremap <leader>n :ASToggle<CR>
-
-
-lua <<EOF
-local cmp = require'cmp'
 cmp.setup({
   snippet = {
     expand = function(args)
@@ -208,11 +155,46 @@ cmp.setup({
     { name = 'vsnip' },
     { name = 'path' },
     { name = 'buffer' },
+    { name = 'conjure'}
   },
 })
 
+local builtin = require('telescope.builtin')
+vim.keymap.set('n', '<leader>ff', builtin.find_files, { desc = 'Telescope find files' })
+vim.keymap.set('n', '<leader>fg', builtin.live_grep, { desc = 'Telescope live grep' })
+vim.keymap.set('n', '<leader>fb', builtin.buffers, { desc = 'Telescope buffers' })
+vim.keymap.set('n', '<leader>fh', builtin.help_tags, { desc = 'Telescope help tags' })
+vim.keymap.set('n', '<leader>fc', builtin.commands, { desc = 'neovim commands' })
+vim.keymap.set('n', '<leader>fv', function()
+        builtin.find_files {
+            cwd = vim.fn.stdpath("config")
+        }
+    end)
+
+vim.api.nvim_create_autocmd('LspAttach', {
+    callback = function(args)
+        vim.keymap.set('n', 'K', vim.lsp.buf.hover, { buffer = args.buf })
+        vim.keymap.set('n', 'gD', vim.lsp.buf.implementation, { buffer = args.buf })
+        vim.keymap.set('n', '<c-]>', vim.lsp.buf.definition, { buffer = args.buf })
+        vim.keymap.set('n', '<c-k>', vim.lsp.buf.signature_help, { buffer = args.buf })
+        vim.keymap.set('n', '1gD', vim.lsp.buf.type_definition, { buffer = args.buf })
+        vim.keymap.set('n', 'gr', vim.lsp.buf.references, { buffer = args.buf })
+        vim.keymap.set('n', 'g0', vim.lsp.buf.document_symbol, { buffer = args.buf })
+        vim.keymap.set('n', 'gW', vim.lsp.buf.workspace_symbol, { buffer = args.buf })
+        vim.keymap.set('n', 'gd', vim.lsp.buf.definition, { buffer = args.buf })
+        vim.keymap.set('n', 'ga', vim.lsp.buf.code_action(), { buffer = args.buf })
+    end,
+})
 EOF
 
+
+" Quick-fix
+
+" toggle tree
+nnoremap <silent> `` :Oil<CR>
+" Setup Completion 
+" See https://github.com/hrsh7th/nvim-cmp#basic-configuration
+nnoremap <leader>n :ASToggle<CR>
 
 
 set signcolumn=yes
@@ -224,8 +206,8 @@ set updatetime=300
 autocmd CursorHold * lua vim.diagnostic.open_float(nil, { focusable = false })
 
 " Goto previous/next diagnostic warning/error
-nnoremap <silent> g[ <cmd>lua vim.diagnostic.goto_prev()<CR>
-nnoremap <silent> g] <cmd>lua vim.diagnostic.goto_next()<CR>
+nnoremap  g[ <cmd>lua vim.diagnostic.goto_prev()<CR>
+nnoremap  g] <cmd>lua vim.diagnostic.goto_next()<CR>
 
 autocmd VimEnter *
             \   if !argc()
@@ -246,7 +228,7 @@ set autoindent              " indent a new line the same amount as the line just
 set number                  " add line numbers
 set wildmode=longest,list   " get bash-like tab completions
 set cc=0                    " set an 80 column border for good coding style
-filetype plugin indent on   "allow auto-indenting depending on file type
+filetype plugin indent off   "allow auto-indenting depending on file type
 set mouse=a                 " enable mouse click
 set clipboard=unnamedplus   " using system clipboard
 filetype plugin on
