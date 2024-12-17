@@ -182,8 +182,8 @@ vim.api.nvim_create_autocmd('LspAttach', {
         vim.keymap.set('n', 'g0', vim.lsp.buf.document_symbol, { buffer = args.buf })
         vim.keymap.set('n', 'gW', vim.lsp.buf.workspace_symbol, { buffer = args.buf })
         vim.keymap.set('n', 'gd', vim.lsp.buf.definition, { buffer = args.buf })
-        vim.keymap.set('n', 'ga', vim.lsp.buf.code_action(), { buffer = args.buf })
-    end,
+        vim.keymap.set('n', 'ga', vim.lsp.buf.code_action, { buffer = args.buf })
+    end
 })
 EOF
 
