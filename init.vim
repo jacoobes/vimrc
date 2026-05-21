@@ -42,6 +42,7 @@ call plug#begin()
  Plug 'guns/vim-sexp'
  Plug 'tpope/vim-sexp-mappings-for-regular-people'
  Plug 'PaterJason/cmp-conjure'
+
 call plug#end()
 
  if has('termguicolors')
@@ -185,6 +186,8 @@ vim.api.nvim_create_autocmd('LspAttach', {
         vim.keymap.set('n', 'ga', vim.lsp.buf.code_action, { buffer = args.buf })
     end,
 })
+
+
 EOF
 
 
